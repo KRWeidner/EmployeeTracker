@@ -1,6 +1,7 @@
-//import inquirer, mysql, and dotenv to hide user data
+//import inquirer, mysql, table and dotenv to hide user data
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const { table } = require('table');
 require('dotenv').config();
 
 // Connect to database
@@ -25,16 +26,20 @@ function init() {
             },
         ])
         .then((response) => {
-            switch(response.action[0])
-            {
+            switch (response.action[0]) {
                 case "1":
+                    ViewAll("department");
+                    break;
+                case "2":
+                    ViewAll("role");
+                    break;
+                case "3":
+                    ViewAll("employee");
                     break;
                 default:
                     Console.log("Bye");
                     break;
             }
-            console.log(response.action[0]);
-            console.log(response);
         })
         .catch((error) => {
             if (error.isTtyError) {
@@ -45,5 +50,24 @@ function init() {
             };
         });
 };
+
+function ViewAll(table_db) {
+    const sql = `SELECT * FROM ${table_db}`;
+
+    db.query({ sql, rowsAsArray: true }, function (err, data, fields) {
+        if (err) {
+            console.log(err);
+        }
+        const columnNames = [];
+        fields.forEach(item => {
+            columnNames.push(item.name);
+        });
+        data.unshift(columnNames)
+        console.log('\n' + table(data));
+ 
+    });
+
+    setTimeout(() => {init()}, 1000);
+}
 
 init();
