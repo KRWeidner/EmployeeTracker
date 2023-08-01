@@ -2,7 +2,7 @@ INSERT INTO department (department_name)
 VALUES ("Accounting"),
        ("HR");
 
-INSERT INTO role (title, salary, department_id)
+INSERT INTO roles (title, salary, department_id)
 VALUES ("HR Officer", 55000.80,2),
        ("Auditor", 75000.25,1),
        ("Manager", 80500.00,1);
