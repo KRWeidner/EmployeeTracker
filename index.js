@@ -85,6 +85,7 @@ async function ViewAll(table_db) {
     setTimeout(() => { init() }, 1000);
 }
 
+//function to delete a row from departments db by department name
 async function DeleteDepartment() {
     const sql = `DELETE FROM department WHERE department_name = ?`;
     const departments = await getAllDepartments();
@@ -108,6 +109,7 @@ async function DeleteDepartment() {
     init();
 }
 
+//function to delete a row from roled db by role title
 async function DeleteRole() {
     const sql = `DELETE FROM roles WHERE title = ?`;
     const roles = await getAllRoles();
@@ -131,6 +133,7 @@ async function DeleteRole() {
     init();
 }
 
+//function to delete an employee from employee db by name
 async function DeleteEmployee() {
     console.log("here");
     const sql = `DELETE FROM employee WHERE first_name = ? and last_name = ?`;
@@ -175,6 +178,7 @@ async function AddDepartment() {
     init();
 }
 
+//inserts a new role into roles db
 async function AddRole() {
     const sql = `INSERT INTO roles (title, salary, department_id) VALUES (?)`;
     const departments = await getAllDepartments();
@@ -210,6 +214,7 @@ async function AddRole() {
     init();
 }
 
+//inserts a new employee into employee db
 async function AddEmployee() {
     const sql = 'INSERT INTO `employee` (first_name, last_name, role_id, manager_id) VALUES (?)';
     const roles = await getAllRoles();
@@ -254,6 +259,7 @@ async function AddEmployee() {
     init();
 }
 
+//updates role of an emplyee based on name
 async function UpdateEmployee() {
     const sql = `UPDATE employee SET role_id = ? WHERE employee.first_name = ? AND employee.last_name = ?`;
     const roles = await getAllRoles();
@@ -286,40 +292,48 @@ async function UpdateEmployee() {
     init();
 }
 
+//begining of helper functions called within main methods to gather additional lookup data
+//returns all department names from department db
 async function getAllDepartments() {
     const sql = `SELECT department_name FROM department`;
     const [rows] = await db.execute(sql);
     return rows.map(item => item.department_name);
 }
 
+//returns the department id based on department name
 async function GetDepartmentId(departmentName) {
     const sql = `SELECT id FROM department WHERE department_name = ?`;
     const [rows] = await db.execute(sql, [departmentName]);
     return rows[0].id;
 }
 
+//returns all role title from roles db
 async function getAllRoles() {
     const sql = `SELECT title FROM roles`;
     const [rows] = await db.execute(sql);
     return rows.map(item => item.title);
 }
 
+//returns role id based on role title
 async function GetRoleId(roleTitle) {
     const sql = `SELECT id FROM roles WHERE title = ?`;
     const [rows] = await db.execute(sql, [roleTitle]);
     return rows[0].id;
 }
 
+//returns all employees' names from employee db
 async function getAllEmployees() {
     const sql = `SELECT first_name,last_name FROM employee`;
     const [rows] = await db.execute(sql);
     return rows.map(item => item.first_name + " " + item.last_name);
 }
 
+//returns employee id based on name
 async function GetEmployeeId(name) {
     const sql = `SELECT id FROM employee WHERE first_name = ? AND last_name = ?`;
     const [rows] = await db.execute(sql, [name.split(' ')[0], name.split(' ')[1]]);
     return rows[0].id;
 }
 
+//call init function to begin program
 init();
