@@ -32,7 +32,7 @@ async function init() {
             ViewAll("department");
             break;
         case "2":
-            ViewAll("role");
+            ViewAll("roles");
             break;
         case "3":
             ViewAll("employee");
@@ -47,14 +47,14 @@ async function init() {
             AddEmployee();
             break;
         case "7":
+            UpdateEmployee();
             break;
         case "8":
-            Console.log("Bye");
+            console.log("Bye");
             process.exit(3);
-            break;
         default:
-            Console.log("Bye");
-            break;
+            console.log("Bye");
+            process.exit(3);
     }
 };
 
@@ -168,7 +168,39 @@ async function AddEmployee() {
                 console.log(err);
             }
         });
-    console.log(response.firstName+" "+response.lastName +" added to database.");
+    console.log(response.firstName + " " + response.lastName + " added to database.");
+    init();
+}
+
+async function UpdateEmployee() {
+    const sql = `UPDATE employee SET role_id = ? WHERE employee.first_name = ? AND employee.last_name = ?`;
+    const roles = await getAllRoles();
+    const employees = await getAllEmployees();
+
+    const response = await inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'Whose employee\'s role do you wish to update?',
+                choices: employees,
+                name: 'employee',
+            },
+            {
+                type: 'list',
+                message: 'Which role do you wish to assign to the selected employee?',
+                choices: roles,
+                name: 'role',
+            },
+        ])
+
+    const roleId = await GetRoleId(response.role.trim());
+    await db.query(sql,
+        [[roleId], [response.employee.split(' ')[0]], [response.employee.split(' ')[1]]], function (err) {
+            if (err) {
+                console.log(err);
+            }
+        });
+    console.log(response.employee + " position updated.");
     init();
 }
 
@@ -185,13 +217,13 @@ async function GetDepartmentId(departmentName) {
 }
 
 async function getAllRoles() {
-    const sql = `SELECT title FROM role`;
+    const sql = `SELECT title FROM roles`;
     const [rows] = await db.execute(sql);
     return rows.map(item => item.title);
 }
 
 async function GetRoleId(roleTitle) {
-    const sql = `SELECT id FROM role WHERE title = ?`;
+    const sql = `SELECT id FROM roles WHERE title = ?`;
     const [rows] = await db.execute(sql, [roleTitle]);
     return rows[0].id;
 }
