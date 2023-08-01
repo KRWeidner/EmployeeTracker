@@ -22,7 +22,7 @@ async function init() {
                 type: 'list',
                 message: 'What would you like to do?',
                 choices: ["1. View All Departments", "2. View All Rows", "3. View All Employees", "4. Add A Department",
-                    "5. Add A Role", "6. Add An Employee", "7. Update An Employee Role"],
+                    "5. Add A Role", "6. Add An Employee", "7. Update An Employee Role", "8. Quit"],
                 name: 'action',
             },
         ])
@@ -44,8 +44,13 @@ async function init() {
             AddRole();
             break;
         case "6":
+            AddEmployee();
             break;
         case "7":
+            break;
+        case "8":
+            Console.log("Bye");
+            process.exit(3);
             break;
         default:
             Console.log("Bye");
@@ -70,6 +75,7 @@ async function ViewAll(table_db) {
 
 //inserts new department to department db table
 async function AddDepartment() {
+    const sql = 'INSERT INTO `department` (department_name) VALUES (?)';
     const response = await inquirer
         .prompt([
             {
@@ -78,7 +84,7 @@ async function AddDepartment() {
                 name: 'department',
             },
         ])
-    db.execute('INSERT INTO `department` (department_name) VALUES (?)', [response.department.trim()], function (err) {
+    await db.query(sql, [response.department.trim()], function (err) {
         if (err) {
             console.log(err);
         }
@@ -112,16 +118,14 @@ async function AddRole() {
         ])
 
     const departmentId = await GetDepartmentId(response.department.trim());
-    console.log([response.role, parseFloat(response.salary).toFixed(2), departmentId]);
-    await db.execute('INSERT INTO `role` (title, salary, department_id) VALUES (?)',
-        [response.role, response.salary, departmentId], function (err) {
+    await db.query(sql,
+        [[response.role, response.salary, departmentId]], function (err) {
             if (err) {
                 console.log(err);
             }
-            console.log(response.role + " added to database.");
         });
-
-    //setTimeout(() => { init() }, 1000);
+    console.log(response.role + " added to database.");
+    init();
 }
 
 async function AddEmployee() {
@@ -158,16 +162,14 @@ async function AddEmployee() {
 
     const roleId = await GetRoleId(response.role.trim());
     const managerId = response.manager !== "None" ? await GetEmployeeId(response.manager) : null;
-    // console.log([response.role, parseFloat(response.salary).toFixed(2), departmentId]);
-    await db.execute(sql,
-        ["Luis", "Mendoza",3,2], function (err) {
+    await db.query(sql,
+        [[response.firstName, response.lastName, roleId, managerId]], function (err) {
             if (err) {
                 console.log(err);
             }
-            console.log(response.role + " added to database.");
         });
-
-    //setTimeout(() => { init() }, 1000);
+    console.log(response.firstName+" "+response.lastName +" added to database.");
+    init();
 }
 
 async function getAllDepartments() {
@@ -201,12 +203,9 @@ async function getAllEmployees() {
 }
 
 async function GetEmployeeId(name) {
-    console.log(name.split(' ')[0]);
-    console.log(name.split(' ')[1]);
     const sql = `SELECT id FROM employee WHERE first_name = ? AND last_name = ?`;
     const [rows] = await db.execute(sql, [name.split(' ')[0], name.split(' ')[1]]);
     return rows[0].id;
 }
 
-//init();
-AddEmployee();
+init();
