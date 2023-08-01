@@ -21,7 +21,7 @@ async function init() {
             {
                 type: 'list',
                 message: 'What would you like to do?',
-                choices: ["1. View All Departments", "2. View All Rows", "3. View All Employees", "4. Add A Department",
+                choices: ["1. View All Departments", "2. View All Roles", "3. View All Employees", "4. Add A Department",
                     "5. Add A Role", "6. Add An Employee", "7. Update An Employee Role", "8. Delete Department", 
                     "9. Delete Role", "10. Delete Employee", "11. Quit"],
                 name: 'action',
